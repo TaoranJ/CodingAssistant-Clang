@@ -1,4 +1,4 @@
-# ProgrammingAssistant/Clang3.5 #
+# CodingAssistant-Clang #
 ***
 
 ## Description ##
@@ -39,6 +39,8 @@ It's very east to use.
 **Attention, '--'is needed**
 
 Writing your own shell script, you can easily use this tool on a project.
+![command](https://github.com/jitara/CodingAssistant-Clang/blob/master/command.png)
+![rule001](https://github.com/jitara/CodingAssistant-Clang/blob/master/rule001.png)
 
 
 ***

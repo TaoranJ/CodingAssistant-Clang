@@ -1,4 +1,4 @@
-# ProgrammingAssistant/Clang3.5 #
+# CodingAssistant-Clang #
 
 ***
 
