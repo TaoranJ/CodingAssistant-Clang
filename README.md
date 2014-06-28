@@ -38,7 +38,7 @@ It's very east to use.
 
 **Attention, '--'is needed**
 
-You can see the ![command](https://github.com/jitara/CodingAssistant-Clang/blob/master/command.png) picture and ![result](https://github.com/jitara/CodingAssistant-Clang/blob/master/rule001.png) picture here.
+You can see the ![command](https://github.com/jitara/CodingAssistant-Clang/blob/master/command.png) picture and ![rule001 of the result](https://github.com/jitara/CodingAssistant-Clang/blob/master/rule001.png) picture here.
 
 Also by writing your own shell script, you can easily use this tool on a project.
 
