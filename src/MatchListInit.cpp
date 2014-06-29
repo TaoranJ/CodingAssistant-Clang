@@ -17,7 +17,7 @@ void ProgrammingLanguage::InitListPrinter::run (const MatchFinder::MatchResult& 
 
     if (varNormal && !ASTUtility::IsDeclInSTDFile(varNormal, Context))
         ASTUtility::Print(varNormal, Context, "Rule013"); 
-    else if (varClass || ASTUtility::IsDeclInSTDFile(varClass, Context))
+    else if (varClass && !ASTUtility::IsDeclInSTDFile(varClass, Context))
     {
         ASTUtility::Print(varClass, Context, "Rule014"); 
         std::ofstream out("Rule014.back");
