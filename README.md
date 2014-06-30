@@ -38,14 +38,14 @@ It's very east to use.
 
 **Attention, '--'is needed**
 
-Writing your own shell script, you can easily use this tool on a project.
-![command](https://github.com/jitara/CodingAssistant-Clang/blob/master/command.png)
-![rule001](https://github.com/jitara/CodingAssistant-Clang/blob/master/rule001.png)
+You can see the ![command](https://github.com/jitara/CodingAssistant-Clang/blob/master/command.png) picture and ![rule001 of the result](https://github.com/jitara/CodingAssistant-Clang/blob/master/rule001.png) picture here.
+
+Also by writing your own shell script, you can easily use this tool on a project.
 
 
 ***
 
 ## Why we do this ##
-This tool is used to do some research works. It will also be helpful in the daily work if you want to avoid some dangerous flaws which may take you very long time to debug(such as "naked" new without using RAII).
+This tool can be used to do some research works. It will also be helpful in the daily work if you want to avoid some dangerous flaws which may take you very long time to debug(such as "naked" new without using RAII). The most exciting thing we think is that based on this tool you can produce you own tailor-made tool easily.  
 
 And this tool is far from perfect sitution. We build this tool in a very easy to learn and understand structure. We provide **UnitTest** directory in which you can manipulate any single feature which you are interested in. And we also provide detail **README** documention in both **UnitTest** and **src**. They will be very helpful.
