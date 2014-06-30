@@ -24,6 +24,9 @@ void ProgrammingLanguage::UsingPrinter::run(const MatchFinder::MatchResult &Resu
 	if(!ud || ASTUtility::IsDeclInSTDFile(ud, Context)) return;
     std::string loc = ud -> getUsingLoc().printToString(Context -> getSourceManager());
 
+    //may get null here
+    if (!ud -> getQualifier() -> getAsNamespace()) return;
+
     if (!ud -> getQualifier() -> getAsNamespace() -> getOriginalNamespace() -> getNameAsString().compare("std"))
         return;
     if (!CheckHeader(loc.substr(0, loc.find(":")))) return;
