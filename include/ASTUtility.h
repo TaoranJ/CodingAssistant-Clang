@@ -200,4 +200,6 @@ class ASTUtility {
             return LD[left.length()][right.length()];
         }
 };
+using namespace clang::ast_matchers;
+
 #endif

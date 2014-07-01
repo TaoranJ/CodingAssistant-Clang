@@ -49,21 +49,20 @@ void ProgrammingLanguage::RecordDeclPrinter::run(const MatchFinder::MatchResult 
     if(!st || !st -> isCompleteDefinition() || !st -> isStruct() || ASTUtility::IsDeclInSTDFile(st, Context)) return;
 
     count++;
-    std::ofstream out("Rule023.back");
+    std::ofstream out(stdout);
     if (!out) return; 
-    out << count;
+    out << st->getNameAsString() << "\n";
 
     for(clang::RecordDecl::field_iterator it = st -> field_begin(); it != st -> field_end(); it++)
     {
         if (!(*it)) continue;
 
-
         if((*it) -> getType() -> isBuiltinType())
-            typeList.push_back((*it) -> getType().getAsString());
+			out << (*it)->getType().getAsString();
         else if((*it) -> getType() -> isPointerType())
-            typeList.push_back(std::string("pointer"));
+			out << "pointer\n";
         else
-            typeList.push_back(std::string("nothing"));
+			out << "nothing\n";
     }
 
     if (!TypeSize(typeList))
