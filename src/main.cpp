@@ -1,15 +1,154 @@
 #include "../include/ProgrammingLanguage.h"
 #include "../include/CodStd101.h"
 #include "../include/EffectiveCPP.h"
+#include "clang/CodeGen/CodeGenAction.h"
+#include "clang/Frontend/CompilerInstance.h"
+#include "clang/Frontend/CompilerInvocation.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/Support/Host.h"
+#include "clang/Parse/ParseAST.h"
 
 //"My tool options" is the name.
 static llvm::cl::OptionCategory MyToolCategory("My tool options");
 
+class PrintFunctionsASTConsumer : public clang::ASTConsumer
+{
+public:
+	virtual bool HandleTopLevelDecl(clang::DeclGroupRef DG)
+	{
+		for (auto pDecl : DG)
+		{
+			if (const clang::NamedDecl *pND = llvm::dyn_cast<clang::NamedDecl>(pDecl))
+			{
+				llvm::errs() << "top-level-decl: " << pND->getNameAsString()
+					<< "\n\tKind: [" << pND->getDeclKindName() << "] "
+					<< "\n\tQualName: " << pND->getQualifiedNameAsString()
+					<< "\n";
+				clang::Decl::Kind declKind = pND->getKind();
+
+				const clang::FunctionDecl* pfnDecl = llvm::dyn_cast<clang::FunctionDecl>(pDecl);
+				if (pfnDecl == nullptr || !pfnDecl->isFirstDecl()) continue;
+
+				llvm::errs() << pfnDecl->getReturnType().getAsString()
+					<< " " << pfnDecl->getName()
+					<< "(";
+				for (auto param : pfnDecl->params())
+				{
+					llvm::errs() << param->getType().getAsString() << ", ";
+				}
+				llvm::errs() << ");";
+			}
+		}
+		return true;
+	}
+};
+
+
+class ClangParser
+{
+	clang::CompilerInstance m_CompilerInstance;
+
+	void prepareCompilerforFile(const char* szSourceCodeFilePath)
+	{
+		// To reuse the source manager we have to create these tables.
+		m_CompilerInstance.getSourceManager().clearIDTables();
+		//m_CompilerInstance.InitializeSourceManager(clang::FrontendInputFile(szSourceCodeFilePath, clang::InputKind::IK_C));// ger(m_CompilerInstance.getFileManager());
+
+		// supply the file to the source manager and set it as main-file 
+		const clang::FileEntry * file = m_CompilerInstance.getFileManager().getFile(szSourceCodeFilePath);
+		clang::FileID fileID = m_CompilerInstance.getSourceManager().createFileID(file, clang::SourceLocation(), clang::SrcMgr::CharacteristicKind::C_User);
+		m_CompilerInstance.getSourceManager().setMainFileID(fileID);
+
+		// CodeGenAction needs this
+		clang::FrontendOptions& feOptions = m_CompilerInstance.getFrontendOpts();
+		feOptions.Inputs.clear();
+		feOptions.Inputs.push_back(clang::FrontendInputFile(szSourceCodeFilePath, clang::FrontendOptions::getInputKindForExtension(clang::StringRef(szSourceCodeFilePath).rsplit('.').second), false));
+	}
+public:
+	ClangParser()
+	{
+		// Usually all examples try to build the CompilerInstance Object from CompilerInvocation object.
+		// However, CompilterInstance already has an in-built CompilerInvocation object. So we use it.
+		// Only problem is: target options are not set correctly for the in-built object. We do it manually.
+		// This below line is just to assert that the object exist.
+		clang::CompilerInvocation& invocation = m_CompilerInstance.getInvocation();
+
+		// Diagnostics is needed - set it up
+		m_CompilerInstance.createDiagnostics();
+
+		// set the include directories path
+		clang::HeaderSearchOptions & headerSearchOptions = m_CompilerInstance.getHeaderSearchOpts();
+		headerSearchOptions.AddPath("C:\\Program Files (x86)\\Microsoft Visual Studio 12.0\\VC\\include", clang::frontend::IncludeDirGroup::Angled, false, false);
+		// headerSearchOptions.Verbose = true;
+
+		// set few options
+		clang::LangOptions& langOptions = m_CompilerInstance.getLangOpts();
+		langOptions.CPlusPlus = 1;
+		langOptions.Bool = 1;
+		langOptions.RTTI = 0;
+#if defined(_MSC_VER)
+		langOptions.MicrosoftExt = 1;
+		langOptions.MSVCCompat = 1;
+		langOptions.MSBitfields = 1;
+		langOptions.DelayedTemplateParsing = 1; // MSVC parses templates at the time of actual use
+		m_CompilerInstance.getDiagnosticOpts().setFormat(clang::TextDiagnosticFormat::Msvc);
+		//clInstance.getTargetOpts().ABI = "microsoft";
+#endif
+
+		// Need to set the source manager before AST
+		m_CompilerInstance.createFileManager();
+		m_CompilerInstance.createSourceManager(m_CompilerInstance.getFileManager());
+
+		// Need to set the target before AST. Adjust the default target options and create a target
+		m_CompilerInstance.getTargetOpts().Triple = llvm::sys::getProcessTriple();
+		m_CompilerInstance.setTarget(clang::TargetInfo::CreateTargetInfo(m_CompilerInstance.getDiagnostics(), &m_CompilerInstance.getTargetOpts()));
+
+		// Create pre-processor and AST Context
+		m_CompilerInstance.createPreprocessor(clang::TranslationUnitKind::TU_Module);
+		m_CompilerInstance.createASTContext();
+		if (m_CompilerInstance.hasPreprocessor())
+		{
+			clang::Preprocessor & preprocessor = m_CompilerInstance.getPreprocessor();
+			preprocessor.getBuiltinInfo().InitializeBuiltins(preprocessor.getIdentifierTable(), preprocessor.getLangOpts());
+		}
+	}
+
+	bool parseAST(const char* szSourceCodeFilePath, clang::ast_matchers::MatchFinder finder)
+	{
+		// create the compiler instance setup for this file as main file
+		prepareCompilerforFile(szSourceCodeFilePath);
+
+		std::unique_ptr<clang::ASTConsumer> pAstConsumer (finder.newASTConsumer());
+		
+		clang::DiagnosticConsumer& diagConsumer = m_CompilerInstance.getDiagnosticClient();
+		diagConsumer.BeginSourceFile(m_CompilerInstance.getLangOpts(), &m_CompilerInstance.getPreprocessor());
+		clang::ParseAST(m_CompilerInstance.getPreprocessor(), pAstConsumer.get(), m_CompilerInstance.getASTContext());
+		diagConsumer.EndSourceFile();
+
+		return diagConsumer.getNumErrors() != 0;
+	}
+
+	// Executes CodeGenAction and returns the pointer (caller should own and delete it)
+	// Returns NULL on failure (in case of any compiler errors etc.)
+	clang::CodeGenAction* emitLLVM(const char* szSourceCodeFilePath)
+	{
+		// create the compiler instance setup for this file as the main file
+		prepareCompilerforFile(szSourceCodeFilePath);
+
+		// Create an action and make the compiler instance carry it out
+		clang::CodeGenAction *Act = new clang::EmitLLVMOnlyAction();
+		if (!m_CompilerInstance.ExecuteAction(*Act))
+			return NULL;
+
+		return Act;
+	}
+
+	clang::ASTContext& GetASTContext() { return m_CompilerInstance.getASTContext(); }
+};
+
+
 int main(int argc, const char **argv)
 {
-    clang::tooling::CommonOptionsParser OptionsParser(argc, argv, MyToolCategory);
-    clang::tooling::ClangTool Tool(OptionsParser.getCompilations(), OptionsParser.getSourcePathList());
-
     clang::ast_matchers::MatchFinder Finder;
 
     //Rule001 MatchCString
@@ -289,6 +428,8 @@ int main(int argc, const char **argv)
     ProgrammingLanguage::UsingPrinter Printer054;
     Finder.addMatcher(ProgrammingLanguage::usingDeclMatcherPL, &Printer054);
         
-    Tool.run(clang::tooling::newFrontendActionFactory(&Finder));
+	ClangParser parser;
+
+	parser.parseAST("E:\\WinApp\\webserver\\include\\settings.h", Finder);
     return 0;
 }
