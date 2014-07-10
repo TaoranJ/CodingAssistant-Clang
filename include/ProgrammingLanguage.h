@@ -46,5 +46,6 @@
 #include "MatchScope.h" 
 #include "MatchUsing.h"
 #include "MatchOnlyDefaultConstructor.h"
+#include "MatchOneParmConstructor.h"
 
 #endif

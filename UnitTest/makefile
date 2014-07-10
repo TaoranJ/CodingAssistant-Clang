@@ -62,6 +62,7 @@ SOURCES = \
 		  MatchPrivate.cpp \
 		  MatchPointerMatch.cpp \
 		  MatchOnlyDefaultConstructor.cpp \
+		  MatchOneParmConstructor.cpp \
 
 OBJECTS = $(SOURCES:.cpp=.o)
 EXES = $(OBJECTS:.o=)

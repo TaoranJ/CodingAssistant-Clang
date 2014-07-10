@@ -59,7 +59,8 @@ OBJECTS = main.o \
 		  MatchVirtualFunc.o \
 		  MatchScope.o \
 		  MatchUsing.o \
-		  MatchOnlyDefaultConstructor.o
+		  MatchOnlyDefaultConstructor.o \
+		  MatchOneParmConstructor.o
 
 CLANGLIBS = \
 				-lclangTooling\

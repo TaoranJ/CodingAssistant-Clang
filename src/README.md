@@ -827,4 +827,19 @@ Implementation:
 
 ***
 
+## Rule 066: MatchOneParmConstructor ##
+
+### Description: ###
+    * By default declare single-argument constructors explicit. 16.5[1]
+### Implementation: ###
+    1. RecordDecl
+    2. isDefinition
+    3. constructorDecl
+    4. parameterCountIs(1)
+    5. non-explicit
+
+### May be bugs: ###
+	* Where are you?
+
+***
 # *to be continued...* #
