@@ -813,4 +813,18 @@ Implementation:
 
 ***
 
+## Rule 065: MatchOnlyDefaultConstructor ##
+
+### Description: ###
+    * Define a constructor to handle initialization of objects. 16.4[1]
+### Implementation: ###
+    1. RecordDecl
+    2. ConstructDecl
+    3. unless
+
+### May be bugs: ###
+	* Where are you?
+
+***
+
 # *to be continued...* #

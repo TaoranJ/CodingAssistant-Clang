@@ -45,5 +45,6 @@
 #include "MatchPointerMath.h" 
 #include "MatchScope.h" 
 #include "MatchUsing.h"
+#include "MatchOnlyDefaultConstructor.h"
 
 #endif

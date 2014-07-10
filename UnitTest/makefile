@@ -3,7 +3,7 @@ LLVMCOMPONENTS := cppbackend
 RTTIFLAG := -fno-rtti
 LLVMCONFIG := /usr/lib/llvm-3.5/bin/llvm-config
 
-CXXFLAGS := -std=c++11 -I$(shell $(LLVMCONFIG) --src-root)/tools/clang/include -I$(shell $(LLVMCONFIG) --obj-root)/tools/clang/include $(shell $(LLVMCONFIG) --cxxflags) $(RTTIFLAG)
+CXXFLAGS := -std=c++11 -s -I$(shell $(LLVMCONFIG) --src-root)/tools/clang/include -I$(shell $(LLVMCONFIG) --obj-root)/tools/clang/include $(shell $(LLVMCONFIG) --cxxflags) $(RTTIFLAG)
 LLVMLDFLAGS := $(shell $(LLVMCONFIG) --ldflags --libs $(LLVMCOMPONENTS))
 
 
@@ -61,6 +61,7 @@ SOURCES = \
 		  MatchCMemFunc.cpp \
 		  MatchPrivate.cpp \
 		  MatchPointerMatch.cpp \
+		  MatchOnlyDefaultConstructor.cpp \
 
 OBJECTS = $(SOURCES:.cpp=.o)
 EXES = $(OBJECTS:.o=)

@@ -289,6 +289,10 @@ int main(int argc, const char **argv)
     ProgrammingLanguage::UsingPrinter Printer054;
     Finder.addMatcher(ProgrammingLanguage::usingDeclMatcherPL, &Printer054);
         
+    //Rule065 MatchOnlyDefaultConstructor
+    ProgrammingLanguage::OnlyDefaultConstructorClassPrinter Printer055;
+    Finder.addMatcher(ProgrammingLanguage::classOnlyDefaultConstructorMatcherPL, &Printer055);
+
     Tool.run(clang::tooling::newFrontendActionFactory(&Finder));
     return 0;
 }

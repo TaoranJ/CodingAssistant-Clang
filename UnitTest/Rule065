@@ -1,0 +1,8 @@
+/home/jtr/CodingAssistant-Clang/UnitTest/test.cpp:1:1:class A {
+public:
+    void test()     {
+    }
+
+
+private:
+}
