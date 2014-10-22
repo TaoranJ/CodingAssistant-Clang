@@ -20,7 +20,7 @@ Our tool is based on the clang-3.5, the latest version of [clang](http://clang.l
 >sudo apt-get install clang-3.5
 
 
->sudo apt-get install llvm-3.5
+>sudo apt-get install libclang-3.5-dev
 
 
 >cd src
