@@ -32,7 +32,7 @@ We found it sometimes may fail to build because of the llvm version, so you can 
 ***
 
 ## Usage ##
-It's very east to use.
+It's very easy to use.
 
 >./utility sourcefile1, sourcefile2 -- [options]
 
